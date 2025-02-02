@@ -23,7 +23,7 @@ jobs:
           cd cmdline-tools/bin/
           yes | ./sdkmanager "platform-tools" "cmdline-tools;latest" "build-tools;32.0.0" --sdk_root='/Users/runner/work/ssh_to_mac/ssh_to_mac/Android_SDK/'
           cd '/Users/runner/work/ssh_to_mac/ssh_to_mac/'
-          tar -czf -9 android.tar.gz 'Android Studio.app' 'Android_SDK'
+          tar -cjf android.tar.bz2 --bzip2 --options bzip2:compression-level=9 'Android Studio.app' 'Android_SDK'
           du -sh *
 
       - name: Deploy rclone
