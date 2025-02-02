@@ -36,4 +36,4 @@ jobs:
       - name: Upload the file to OneDrive with rclone
         run: |
           cd rclone-v1.69.0-osx-arm64
-          ./rclone --config rclone.conf copy -P ../test.tar "OneDrive-30GB-ty:"
+          ./rclone --config rclone.conf copy -P ../android.tar.gz "OneDrive-30GB-ty:"
