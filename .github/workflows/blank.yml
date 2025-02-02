@@ -1,13 +1,39 @@
-name: ssh_to_macOS
-on: [push]
-jobs:
-  build:
-    runs-on: macos-15
-    timeout-minutes: 999
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+name: D
 
+on: [push]
+
+jobs:
+  Build:
+    runs-on: macos-15
+    steps:
+      - name: Download Android Studio dmg installer for arm_macOS
+        run: |
+          brew install axel
+          axel -n 32 'https://redirector.gvt1.com/edgedl/android/studio/install/2024.2.2.13/android-studio-2024.2.2.13-mac_arm.dmg'
+          sha256sum *.dmg | grep -i '688f8d007e612f3f0c18f316179079dc4565f93d8d1e6a7dad80c4cfce356df7'
+          hdiutil attach -noverify 'android-studio-2024.2.2.13-mac_arm.dmg'
+          cp -Rp '/Volumes/Android Studio - Ladybug Feature Drop | 2024.2.2/Android Studio.app' ./
+
+      - name: Download Android Command line tools for macOS 
+        run: |
+          axel -n 32 'https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip'
+          sha256sum *.zip | grep -i '7bc5c72ba0275c80a8f19684fb92793b83a6b5c94d4d179fc5988930282d7e64'
+          unzip -q commandlinetools-mac-11076708_latest.zip
+          mkdir -p '/Users/runner/work/ssh_to_mac/ssh_to_mac/Android_SDK/'
+          cd cmdline-tools/bin/
+          yes | ./sdkmanager "platform-tools" "cmdline-tools;latest" "build-tools;32.0.0" --sdk_root='/Users/runner/work/ssh_to_mac/ssh_to_mac/Android_SDK/'
+          cd '/Users/runner/work/ssh_to_mac/ssh_to_mac/'
+          tar -czf android.tar.gz 'Android Studio.app' 'Android_SDK'
+          du -sh *
+
+      - name: Deploy rclone
+        run: |
+          axel -n 32 'https://downloads.rclone.org/v1.69.0/rclone-v1.69.0-osx-arm64.zip'
+          unzip -q rclone-v1.69.0-osx-arm64.zip
+          echo '${{ secrets.RCLONE_CONF }}' > rclone-v1.69.0-osx-arm64/rclone.conf
+          rm rclone-v1.69.0-osx-arm64.zip
+
+      - name: Upload the file to OneDrive with rclone
+        run: |
+          cd rclone-v1.69.0-osx-arm64
+          ./rclone --config rclone.conf copy -P ../test.tar "OneDrive-30GB-ty:"
