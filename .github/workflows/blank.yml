@@ -23,7 +23,7 @@ jobs:
           cd cmdline-tools/bin/
           yes | ./sdkmanager "platform-tools" "cmdline-tools;latest" "build-tools;32.0.0" --sdk_root='/Users/runner/work/ssh_to_mac/ssh_to_mac/Android_SDK/'
           cd '/Users/runner/work/ssh_to_mac/ssh_to_mac/'
-          tar -cf test.tar 'Android Studio.app' 'Android_SDK'
+          tar -czf -9 android.tar.gz 'Android Studio.app' 'Android_SDK'
           du -sh *
 
       - name: Deploy rclone
@@ -36,4 +36,5 @@ jobs:
       - name: Upload the file to OneDrive with rclone
         run: |
           cd rclone-v1.69.0-osx-arm64
-          ./rclone --config rclone.conf copy -P test.tar "OneDrive-30GB-ty:"
+          ./rclone --config rclone.conf copy -P ../test.tar "OneDrive-30GB-ty:"
+
